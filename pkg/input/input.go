@@ -6,17 +6,23 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 )
 
-const urlFormat = "https://adventofcode.com/%d/day/%d/input"
+const (
+	urlFormat       = "https://adventofcode.com/%d/day/%d/input"
+	SessionFileName = "session"
+	sessionKeyId    = "session"
+)
 
 //go:embed *.txt
 var txtFiles embed.FS
 
 // Fetch2021Input fetches problem input for the given day in 2021.
 func Fetch2021Input(day int) string {
-	return fetchFileInput(day)
-	// return fetchWebInput(2021, day)
+	// return fetchFileInput(day)
+	return strings.TrimSpace(fetchWebInput(2021, day))
 }
 
 func fetchFileInput(day int) string {
@@ -30,17 +36,49 @@ func fetchFileInput(day int) string {
 
 // fetchWebInput fetches problem input for the given year and day, from the
 // original web page.
-// TODO: User authentication will be needed
 func fetchWebInput(year int, day int) string {
-	res, err := http.Get(fmt.Sprintf(urlFormat, year, day))
+
+	// Create request
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf(urlFormat, year, day),
+		nil,
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Include session header in request
+	req.Header = http.Header{
+		"cookie": {
+			fmt.Sprintf("%s=%s", sessionKeyId, getSession()),
+		},
+	}
+
+	// Launch request
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Return response as a string
 	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return string(content)
+}
+
+func getSession() string {
+	if _, err := os.Stat(SessionFileName); os.IsNotExist(err) {
+		log.Fatalf("File containing session data (%s) does not exist", SessionFileName)
+	}
+
+	content, err := os.ReadFile(SessionFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return strings.TrimSpace(string(content))
 }
