@@ -6,10 +6,10 @@ import (
 	"reflect"
 )
 
-type Solution struct{}
+type Solution2021 struct{}
 
 func InvokeSolution(day int, part int) {
-	s := Solution{}
+	s := Solution2021{}
 	method := reflect.ValueOf(s).MethodByName(
 		fmt.Sprintf("S%d_%d", day, part),
 	).Interface().(func(string) string)

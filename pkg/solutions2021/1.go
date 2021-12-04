@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func (s Solution) S1_1(input string) string {
+func (s Solution2021) S1_1(input string) string {
 	inputs := strings.Split(input, "\n")
 
 	increaseCount := 0
@@ -34,7 +34,7 @@ func (s Solution) S1_1(input string) string {
 	return strconv.Itoa(increaseCount)
 }
 
-func (s Solution) S1_2(input string) string {
+func (s Solution2021) S1_2(input string) string {
 	inputs := strings.Split(input, "\n")
 	inputsLen := len(inputs)
 
