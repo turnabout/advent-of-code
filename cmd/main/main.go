@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	solutions2021.InvokeSolution(2)
+	solutions2021.InvokeSolution(1, 1)
 }

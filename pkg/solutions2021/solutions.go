@@ -8,10 +8,10 @@ import (
 
 type Solution struct{}
 
-func InvokeSolution(day int) {
+func InvokeSolution(day int, part int) {
 	s := Solution{}
 	method := reflect.ValueOf(s).MethodByName(
-		fmt.Sprintf("S%d", day),
+		fmt.Sprintf("S%d_%d", day, part),
 	).Interface().(func(string) string)
 
 	fmt.Println(method(input.Fetch2021Input(day)))
