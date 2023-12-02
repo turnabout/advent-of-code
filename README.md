@@ -16,3 +16,5 @@ func (Runner) Y23_1(input string) {
     fmt.Println("day 1")
 }
 ```
+
+> Fetched input is kept in files in the `cache` directory to avoid sending unnecessary requests. Delete a file associated with a specific day to force re-fetching from the website.
