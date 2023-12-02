@@ -119,6 +119,12 @@ func NewCubeSet(input string) CubeSet {
 	return cs
 }
 
+// Power gets the power of the set of CubeSet.
+// > The power of a set of cubes is equal to the numbers of red, green, and blue cubes multiplied together.
+func (cs CubeSet) Power() int {
+	return cs.Red * cs.Green * cs.Blue
+}
+
 func (Runner) Y23_2_1(input string) {
 	cgs := NewCubeGamesFromString(input)
 
@@ -144,4 +150,12 @@ func (Runner) Y23_2_1(input string) {
 }
 
 func (Runner) Y23_2_2(input string) {
+	cgs := NewCubeGamesFromString(input)
+	powerSum := 0
+
+	for _, cg := range cgs {
+		powerSum += cg.Highest().Power()
+	}
+
+	fmt.Printf("%d\n", powerSum)
 }
