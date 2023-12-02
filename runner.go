@@ -10,12 +10,12 @@ type Runner struct {
 }
 
 // invokeRunnerFunction invokes the runner function for the given
-func invokeRunnerFunction(year int, day int) {
+func invokeRunnerFunction(year int, day int, part int) {
 	runner := &Runner{}
 
-	// Get method name (Y<short year>_<day>)
+	// Get method name (Y<short year>_<day>_<part>)
 	shortYear := 2023 % 2000
-	methodName := fmt.Sprintf("Y%d_%d", shortYear, day)
+	methodName := fmt.Sprintf("Y%d_%d_%d", shortYear, day, part)
 
 	method := reflect.ValueOf(runner).MethodByName(methodName)
 
@@ -24,6 +24,6 @@ func invokeRunnerFunction(year int, day int) {
 
 		method.Call([]reflect.Value{reflect.ValueOf(input)})
 	} else {
-		log.Fatalf("Method '%s' was not found", methodName)
+		log.Fatalf("Runner method '%s' was not found", methodName)
 	}
 }
