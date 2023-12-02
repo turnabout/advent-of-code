@@ -5,21 +5,17 @@ To define a solution for a given day, create a new file (standard format: `y<yea
 
 To fetch input from the website, a `SESSION` environment variable must be set to the user's session value. This can be recovered by logging in to [the Advance of Code website](https://adventofcode.com/), copying the value for the `session` cookie.
 
-Example day methods (will automatically receive the raw input as a string argument):
+Example day methods for day 1 (when running `invokeRunnerFunction`, will get invoked & automatically receive their corresponding raw input as a string argument):
 
 ```go
 package main
 
 import "fmt"
 
-// Puzzle part 1
 func (Runner) Y23_1_1(input string) {
-    fmt.Println("day 1")
 }
 
-// Puzzle part 2
 func (Runner) Y23_1_2(input string) {
-	fmt.Println("day 1")
 }
 ```
 
