@@ -10,8 +10,6 @@ Example day methods for day 1 (when running `invokeRunnerFunction`, will get inv
 ```go
 package main
 
-import "fmt"
-
 func (Runner) Y23_1_1(input string) {
 }
 
