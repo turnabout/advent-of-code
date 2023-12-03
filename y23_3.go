@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/fatih/color"
 	"log"
@@ -33,6 +34,47 @@ func (c CBoard) CharAtCoordsIsSymbolish(x, y int) bool {
 	}
 
 	return charIsSymbol(c[y][x])
+}
+
+func (c CBoard) GetChar(x, y int) (rune, error) {
+	if x < 0 || y < 0 || y >= len(c) || x >= len(c[0]) {
+		return ' ', errors.New("out of bounds")
+	}
+
+	return c[y][x], nil
+}
+
+func (c CBoard) GetCharsBoxChars(leftX, topY, rightX, botY int, fn func(rune, Coordinates)) {
+	// Top line
+	for x := leftX; x <= rightX; x++ {
+		y := topY
+
+		if !c.IsOob(x, y) {
+			fn(c[y][x], Coordinates{X: x, Y: y})
+		}
+	}
+
+	// Bottom line
+	for x := leftX; x <= rightX; x++ {
+		y := botY
+
+		if !c.IsOob(x, y) {
+			fn(c[y][x], Coordinates{X: x, Y: y})
+		}
+	}
+
+	// Left & right
+	x := leftX
+	y := topY + 1
+
+	if !c.IsOob(x, y) {
+		fn(c[y][x], Coordinates{X: x, Y: y})
+	}
+
+	x = rightX
+	if !c.IsOob(x, y) {
+		fn(c[y][x], Coordinates{X: x, Y: y})
+	}
 }
 
 func (b CBoard) PrintAllSymbolInBoundaries(topLeftX, topLeftY, botRightX, botRightY int) {
@@ -217,34 +259,6 @@ func (nc NumberCoords) TouchesAny(coordsList []Coords) bool {
 }
 
 func (Runner) Y23_3_1(input string) {
-
-	/*
-			input = `467..114..
-		...*......
-		..35..633.
-		......#...
-		617*......
-		.....+.58.
-		..592.....
-		......755.
-		...$.*....
-		.664.598..`
-	*/
-
-	/*
-			input = `...............................930...................................283...................453.34.............................867....282....
-		....=.........370...........................48..456......424...-.341*.....554...*807.571............971..958............166......*..........
-		..159.........../..........539*.....73......-...*.......+....954.........*.....7.......*........*.....*....*.....405$..*.......31.........15
-		...............................873..*............726.............94.......126.........699....253....584..750................................
-		.660.................................336.....391.................*....860......76..................................435....576.....-.........
-		.................................888............*924...55......308.......*91.........446...535......87...136/........*...*........793.=351..
-		...........826...949...120...985..&....................*.......................462.../......*.........*.......358..932..599.479*............
-		............../.....%..*......%...............151.304..931..471.......601.....*............765........805....%..................149...345...
-		........................216..........................+......*............#..906...-......................................105...........&....
-		.......&..827*327.375-.................923.......*..........630......851..........459..656.......340.432........915.288....#.865*...........
-		.....693......................866......*......575.970...........201...................%........%...*.=...........+....*..........305.....666
-		.........%536......345..............166........................*....@905....863.&...........916..212.....386*963.....183....................`
-	*/
 
 	b := NewCBoard(input)
 	// printCBoard(b)
@@ -439,7 +453,105 @@ func (Runner) Y23_3_1(input string) {
 	*/
 }
 
+type Coordinates struct {
+	X int
+	Y int
+}
+
+// Key: coordinates for the gear
+// Value: numbers that touch the gear
+type GearValues map[Coordinates][]int
+
 func (Runner) Y23_3_2(input string) {
+
+	cb := NewCBoard(input)
+	gearValues := GearValues{}
+
+	// total := 0
+
+	for y, row := range cb {
+
+		for x := 0; x < len(row); x++ {
+			char := cb[y][x]
+
+			if !unicode.IsDigit(char) {
+				continue
+			}
+
+			// Starting number
+			accumNumStr := fmt.Sprintf("%c", char)
+
+			// Get rest of number
+			for numX := x + 1; true; numX++ {
+				nextChar, err := cb.GetChar(numX, y)
+
+				// Out of bounds or not digit
+				if err != nil || !unicode.IsDigit(nextChar) {
+					break
+				}
+
+				accumNumStr += string(nextChar)
+			}
+
+			// Convert accumulated number to int
+			accumNumInt, err := strconv.Atoi(accumNumStr)
+			if err != nil {
+				log.Fatalf("failed to convert '%s' to integer", accumNumStr)
+			}
+
+			// Get all coords around this number
+			leftX := x - 1
+			topY := y - 1
+
+			rightX := x + len(accumNumStr)
+			botY := y + 1
+
+			cb.GetCharsBoxChars(leftX, topY, rightX, botY, func(r rune, c Coordinates) {
+				if r != '*' {
+					return
+				}
+
+				// Encountered an adjacent asterisk, record the number to it
+
+				// Already at least one value, just add to it
+				if _, ok := gearValues[c]; ok {
+					gearValues[c] = append(
+						gearValues[c],
+						accumNumInt,
+					)
+					return
+				}
+
+				// No existing values, create the slice
+				gearValues[c] = []int{accumNumInt}
+
+				// fmt.Printf("Encountered * adjacent to %d at %d,%d\n", accumNumInt, c.X, c.Y)
+			})
+
+			// fmt.Printf("%d\n", accumNumInt)
+
+			// Set x to after the number
+			x += len(accumNumStr) - 1
+		}
+
+	}
+
+	gearRatios := 0
+	for gearCoords, gearNums := range gearValues {
+		if len(gearNums) != 2 {
+			continue
+		}
+
+		gearRatios += gearNums[0] * gearNums[1]
+
+		fmt.Printf("Taking into account gear at %d,%d\n", gearCoords.X, gearCoords.Y)
+		for _, num := range gearNums {
+			fmt.Printf("%d\n", num)
+		}
+
+		fmt.Println()
+	}
+	fmt.Printf("%d\n", gearRatios)
 }
 
 func printBoard(b Board) {
