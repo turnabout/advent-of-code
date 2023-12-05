@@ -30,6 +30,9 @@ type Card struct {
 	Id             int
 	WinningNumbers Numbers
 	Numbers        Numbers
+
+	// CardCount is the count of this card we have.
+	CardCount int
 }
 
 func (c Card) GetScore() int {
@@ -85,7 +88,7 @@ func intsToFields(ints []int) []string {
 }
 
 func NewCardFromLineInput(line string, id int) Card {
-	card := Card{Id: id}
+	card := Card{Id: id, CardCount: 1}
 
 	numbersSectionStr := strings.Split(line, ": ")[1]
 	numbersStrArr := strings.Split(numbersSectionStr, " | ")
@@ -137,49 +140,46 @@ func (Runner) Y23_4_1(input string) {
 }
 
 func (Runner) Y23_4_2(input string) {
-	ogCards := NewCardsFromInput(input)
-	cardsLeft := make([]Card, len(ogCards))
-	copy(cardsLeft, ogCards)
+	input = `Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
+Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
+Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
+Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
+Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
+Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11`
 
+	cards := NewCardsFromInput(input)
 	cardsEncountered := 0
 
-	for i := 0; i < len(cardsLeft); i++ {
-		card := cardsLeft[i]
+	for i, card := range cards {
 		matchingNumsCount := card.GetMatchingNumbers()
-		cardsEncountered++
+		cardsEncountered += card.CardCount
 
 		if matchingNumsCount == 0 {
 			continue
 		}
 
-		originalI := card.Id - 1
-
-		wonCardsIndexStart := originalI + 1
-		wonCardsIndexEnd := originalI + matchingNumsCount + 1
-
-		// Make sure we don't go OOB (can't get cards beyond the limit)
-		if wonCardsIndexEnd > len(cardsLeft) {
-			wonCardsIndexEnd = len(cardsLeft)
-		}
-
-		wonCards := ogCards[wonCardsIndexStart:wonCardsIndexEnd]
 		wonCardsIds := []string{}
-		for _, wonCard := range wonCards {
-			wonCardsIds = append(wonCardsIds, strconv.Itoa(wonCard.Id))
+
+		// Update following cards' CardCount
+		for j := 1; j <= matchingNumsCount; j++ {
+			nextCardIdx := i + j
+
+			// OOB, break out
+			if nextCardIdx >= len(cards) {
+				break
+			}
+
+			wonCardsIds = append(wonCardsIds, strconv.Itoa(cards[nextCardIdx].Id))
+			cards[nextCardIdx].CardCount += card.CardCount
 		}
 
-		cardsLeft = append(cardsLeft, wonCards...)
-
-		// This approach is quite inefficient and slow, especially with the prints
-		// TODO: Look at a different approach.
-		// Instead, we could probably add a "CardCount" field to each cards.
-		// Then whenever there is a winning card, it adds '+n' to the "CardCount" of cards ahead of it,
-		// where 'n' = the "CardCount" of the current card.
 		/*
 			fmt.Printf(
-				"Card %d has %d matching numbers. Winning: {%s}\n",
+				"Card %d (count: %d) has %d matching numbers. Winning %d of: {%s}\n",
 				card.Id,
+				card.CardCount,
 				matchingNumsCount,
+				card.CardCount,
 				strings.Join(wonCardsIds, ","),
 			)
 		*/
@@ -188,6 +188,7 @@ func (Runner) Y23_4_2(input string) {
 	fmt.Println("---------------------")
 	fmt.Printf("Total cards: %d\n", cardsEncountered)
 	fmt.Println("---------------------")
+	// Answer with full input:
 	/*
 		---------------------
 		Total cards: 8570000
