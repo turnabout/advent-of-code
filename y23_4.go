@@ -27,6 +27,7 @@ func (nums Numbers) CountSame(cmpNums Numbers) int {
 }
 
 type Card struct {
+	Id             int
 	WinningNumbers Numbers
 	Numbers        Numbers
 }
@@ -43,6 +44,11 @@ func (c Card) GetScore() int {
 	return int(
 		math.Pow(2, float64(sameCount)),
 	)
+}
+
+// GetMatchingNumbers gets the amount of Numbers that are matching with winning Numbers.
+func (c Card) GetMatchingNumbers() int {
+	return c.WinningNumbers.CountSame(c.Numbers)
 }
 
 func PrintCardsList(cards []Card) {
@@ -78,8 +84,8 @@ func intsToFields(ints []int) []string {
 	return fields
 }
 
-func NewCardFromLineInput(line string) Card {
-	card := Card{}
+func NewCardFromLineInput(line string, id int) Card {
+	card := Card{Id: id}
 
 	numbersSectionStr := strings.Split(line, ": ")[1]
 	numbersStrArr := strings.Split(numbersSectionStr, " | ")
@@ -103,10 +109,12 @@ func NewCardsFromInput(input string) []Card {
 	cards := []Card{}
 
 	scanner := bufio.NewScanner(strings.NewReader(input))
+	i := 0
 	for scanner.Scan() {
+		i++
 		cards = append(
 			cards,
-			NewCardFromLineInput(scanner.Text()),
+			NewCardFromLineInput(scanner.Text(), i),
 		)
 	}
 
@@ -129,4 +137,60 @@ func (Runner) Y23_4_1(input string) {
 }
 
 func (Runner) Y23_4_2(input string) {
+	ogCards := NewCardsFromInput(input)
+	cardsLeft := make([]Card, len(ogCards))
+	copy(cardsLeft, ogCards)
+
+	cardsEncountered := 0
+
+	for i := 0; i < len(cardsLeft); i++ {
+		card := cardsLeft[i]
+		matchingNumsCount := card.GetMatchingNumbers()
+		cardsEncountered++
+
+		if matchingNumsCount == 0 {
+			continue
+		}
+
+		originalI := card.Id - 1
+
+		wonCardsIndexStart := originalI + 1
+		wonCardsIndexEnd := originalI + matchingNumsCount + 1
+
+		// Make sure we don't go OOB (can't get cards beyond the limit)
+		if wonCardsIndexEnd > len(cardsLeft) {
+			wonCardsIndexEnd = len(cardsLeft)
+		}
+
+		wonCards := ogCards[wonCardsIndexStart:wonCardsIndexEnd]
+		wonCardsIds := []string{}
+		for _, wonCard := range wonCards {
+			wonCardsIds = append(wonCardsIds, strconv.Itoa(wonCard.Id))
+		}
+
+		cardsLeft = append(cardsLeft, wonCards...)
+
+		// This approach is quite inefficient and slow, especially with the prints
+		// TODO: Look at a different approach.
+		// Instead, we could probably add a "CardCount" field to each cards.
+		// Then whenever there is a winning card, it adds '+n' to the "CardCount" of cards ahead of it,
+		// where 'n' = the "CardCount" of the current card.
+		/*
+			fmt.Printf(
+				"Card %d has %d matching numbers. Winning: {%s}\n",
+				card.Id,
+				matchingNumsCount,
+				strings.Join(wonCardsIds, ","),
+			)
+		*/
+	}
+
+	fmt.Println("---------------------")
+	fmt.Printf("Total cards: %d\n", cardsEncountered)
+	fmt.Println("---------------------")
+	/*
+		---------------------
+		Total cards: 8570000
+		---------------------
+	*/
 }
