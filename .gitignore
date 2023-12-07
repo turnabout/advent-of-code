@@ -1,2 +1,2 @@
-/cache/*
-!/cache/.gitkeep
+/go/cache/*
+!/go/cache/.gitkeep
