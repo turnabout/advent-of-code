@@ -44,11 +44,10 @@ def calc_distance(total_time, held_time):
 
 
 def part1(test_input, real_input):
-    use_real_input = False
+    use_real_input = True
     input = real_input if use_real_input else test_input
 
-
-    parsed = parse(test_input)
+    parsed = parse(input)
     answer = 1
 
     for item in parsed:
