@@ -13,8 +13,8 @@ def run(year, day, part):
     answer = import_day_fn(year, day, part)(
         *get_day_inputs(year, day)
     )
-    print(f'Answer: ', answer)
+    print(f"Answer: ", answer)
 
 
 if __name__ == "__main__":
-    run(23, 6, 1)
+    run(23, 7, 1)

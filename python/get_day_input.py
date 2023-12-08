@@ -48,6 +48,6 @@ def get_real_day_input(year, day):
         }
     )
     with urlopen(request) as response:
-        content = response.read().decode("utf-8")
+        content = response.read().decode("utf-8").strip()
 
     return content
