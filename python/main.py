@@ -17,4 +17,4 @@ def run(year, day, part):
 
 
 if __name__ == "__main__":
-    run(23, 7, 1)
+    run(23, 7, 2)
