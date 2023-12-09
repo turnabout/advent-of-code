@@ -3,13 +3,13 @@ from urllib.request import Request, urlopen
 
 
 def get_day_inputs(year, day):
-    return get_test_day_input(year, day).strip(), get_cached_real_day_input(year, day).strip()
+    return get_sample_day_input(year, day).strip(), get_cached_real_day_input(year, day).strip()
 
 
-def get_test_day_input(year, day):
-    file_path = f"cache/{year}_{day}_test.txt"
+def get_sample_day_input(year, day):
+    file_path = f"cache/{year}_{day}_sample.txt"
     if not path.exists(file_path):
-        raise ValueError(f"test day input file at '{file_path}' does not exist")
+        raise ValueError(f"sample day input file at '{file_path}' does not exist")
 
     with open(file_path, "r") as file:
         return file.read()
