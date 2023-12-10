@@ -15,7 +15,7 @@ day=$2
 python_file="y${year}_${day}.py"
 cat <<EOF >"$python_file"
 use_real_input = False
-use_part = 1
+used_part = 1
 
 
 def part1(input):
@@ -30,10 +30,10 @@ EOF
 
 echo "Python file created: $python_file"
 
-# Create test input file in the 'cache' directory
+# Create sample input file in the 'cache' directory
 cache_dir="cache"
-test_input_file="${cache_dir}/${year}_${day}_test.txt"
+sample_input_file="${cache_dir}/${year}_${day}_sample.txt"
 mkdir -p "$cache_dir"
-touch "$test_input_file"
+touch "$sample_input_file"
 
-echo "Test input file created: $test_input_file"
+echo "Sample input file created: $sample_input_file"
