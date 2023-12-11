@@ -26,6 +26,5 @@ def run(year, day):
     answer = fn(input)
     print(f"Answer: ", answer)
 
-
 if __name__ == "__main__":
-    run(23, 8)
+    run(23, 9)
