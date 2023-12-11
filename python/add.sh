@@ -18,11 +18,11 @@ use_real_input = False
 used_part = 1
 
 
-def part1(input):
+def part1(input: str):
     print(f"Part 1 called with input:\n{input}")
 
 
-def part2(input):
+def part2(input: str):
     print(f"Part 2 called with input:\n{input}")
 
 
